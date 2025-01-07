@@ -4,7 +4,8 @@ import os
 import time
 from urllib.parse import urlencode
 
-import requests
+import aiofiles
+import aiohttp
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters.command import Command
 from aiogram.types import FSInputFile
@@ -39,14 +40,16 @@ async def video_download(message: types.Message):
 
     # Build and request
     body = urlencode({"q": message.text, "lang": "ru"})
-    response = requests.post(
-        url="https://snaptik.net/api/ajaxSearch",
-        data=body,
-        headers={
-            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 YaBrowser/24.12.0.0 Safari/537.36",
-        },
-    ).json()
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            url="https://snaptik.net/api/ajaxSearch",
+            data=body,
+            headers={
+                "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 YaBrowser/24.12.0.0 Safari/537.36",
+            },
+        ) as response:
+            response = await response.json()
 
     # Check status code
     if response["status"] != "ok":
@@ -66,16 +69,17 @@ async def video_download(message: types.Message):
     )
 
     # Downloading Video
-    with requests.get(video_url, timeout=(50, 10000), stream=True) as response:
-        response.raise_for_status()
-        file_name = f"{int(time.time())}.mp4"
-        downloaded = 0
-        chunk_size = 1048576  # 1 MB
-        with open(file_name, "wb") as file:
-            for chunk in response.iter_content(chunk_size=chunk_size):
-                if chunk:
-                    file.write(chunk)
-                    downloaded += len(chunk)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(video_url, timeout=aiohttp.ClientTimeout(total=10000)) as response:
+            response.raise_for_status()
+            file_name = f"{int(time.time())}.mp4"
+            downloaded = 0
+            chunk_size = 1048576  # 1 MB
+            async with aiofiles.open(file_name, "wb") as file:
+                async for chunk in response.content.iter_chunked(chunk_size):
+                    if chunk:
+                        await file.write(chunk)
+                        downloaded += len(chunk)
 
     await bot.send_video(chat_id=chat_id, video=FSInputFile(file_name), supports_streaming=True)
     await current_message.edit_text("Video uploaded to Telegram!🥳")
@@ -83,9 +87,7 @@ async def video_download(message: types.Message):
     try:
         os.remove(file_name)
     except Exception as e:
-        await bot.send_message(
-            chat_id=message.chat.id, text="Error deleting file: " + str(e)
-        )
+        print("ERR_DELETE", e)
 
 
 if __name__ == "__main__":
