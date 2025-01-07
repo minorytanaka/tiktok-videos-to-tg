@@ -54,7 +54,6 @@ async def video_download(message: types.Message):
     # Check status code
     if response["status"] != "ok":
         await current_message.edit_text(
-            message_id=current_message.message_id,
             text="Status code not ok",
             disable_web_page_preview=False,
         )
@@ -67,7 +66,6 @@ async def video_download(message: types.Message):
         if "HD" in link.get_text(strip=True)
     )
     await current_message.edit_text(
-        message_id=current_message.message_id,
         text="Got video link",
         disable_web_page_preview=False,
     )
@@ -88,7 +86,6 @@ async def video_download(message: types.Message):
                         downloaded += len(chunk)
 
     await current_message.edit_text(
-        message_id=current_message.message_id,
         text="Video Downloaded. Start Uploading",
         disable_web_page_preview=False,
     )
