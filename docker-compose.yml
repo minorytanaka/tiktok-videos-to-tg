@@ -1,0 +1,18 @@
+version: "3.10"
+services:
+  tiktok_scrapper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tiktok_scrapper
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    restart: always
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
