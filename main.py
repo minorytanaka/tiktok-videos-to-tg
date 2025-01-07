@@ -67,10 +67,18 @@ async def video_download(message: types.Message):
         for link in soup.find_all("a", class_="tik-button-dl")
         if "HD" in link.get_text(strip=True)
     )
+    await current_message.edit_text(
+        chat_id=message.chat.id,
+        message_id=current_message.message_id,
+        text="Got video link",
+        disable_web_page_preview=False,
+    )
 
     # Downloading Video
     async with aiohttp.ClientSession() as session:
-        async with session.get(video_url, timeout=aiohttp.ClientTimeout(total=10000)) as response:
+        async with session.get(
+            video_url, timeout=aiohttp.ClientTimeout(total=10000)
+        ) as response:
             response.raise_for_status()
             file_name = f"{int(time.time())}.mp4"
             downloaded = 0
@@ -81,7 +89,16 @@ async def video_download(message: types.Message):
                         await file.write(chunk)
                         downloaded += len(chunk)
 
-    await bot.send_video(chat_id=chat_id, video=FSInputFile(file_name), supports_streaming=True)
+    await current_message.edit_text(
+        chat_id=message.chat.id,
+        message_id=current_message.message_id,
+        text="Video Downloaded. Start Uploading",
+        disable_web_page_preview=False,
+    )
+
+    await bot.send_video(
+        chat_id=chat_id, video=FSInputFile(file_name), supports_streaming=True
+    )
     await current_message.edit_text("Video uploaded to Telegram!🥳")
 
     try:
