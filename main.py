@@ -13,11 +13,11 @@ from aiogram.filters.command import Command
 from aiogram.types import FSInputFile
 from bs4 import BeautifulSoup
 
-from settings import admin_id, bot_token, chat_id
+from settings import admin_id, bot_token, chat_id, ip, port
 
 
 logging.basicConfig(level=logging.INFO)
-session = AiohttpSession(api=TelegramAPIServer.from_base("http://localhost:8081"))
+session = AiohttpSession(api=TelegramAPIServer.from_base(f"http://{ip}:{port}"))
 bot = Bot(session=session, token=bot_token)
 dp = Dispatcher()
 
@@ -73,52 +73,40 @@ async def upload_to_channel(message: types.Message):
         disable_web_page_preview=False,
     )
 
-    # Downloading Video
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-            video_url, timeout=aiohttp.ClientTimeout(total=10000)
-        ) as response:
-            response.raise_for_status()
-            file_name = f"{int(time.time())}.mp4"
-            downloaded = 0
-            chunk_size = 1048576  # 1 MB
-            async with aiofiles.open(file_name, "wb") as file:
-                async for chunk in response.content.iter_chunked(chunk_size):
-                    if chunk:
-                        await file.write(chunk)
-                        downloaded += len(chunk)
-
-    await current_message.edit_text(
-        text="Video Downloaded. Start Uploading",
-        disable_web_page_preview=False,
-    )
-    await bot.send_video(
-        chat_id=chat_id, video=FSInputFile(file_name), supports_streaming=True
-    )
-    await current_message.edit_text("Video uploaded to Telegram!🥳")
-
-    # response = await send_video_to_telegram(file_name)
-    # if response.get("ok"):
-    #     await current_message.edit_text("Video uploaded to Telegram!🥳")
-    # else:
-    #     await current_message.edit_text("Failed to upload video. Please try again.")
     try:
-        os.remove(file_name)
+        # Downloading Video
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                video_url, timeout=aiohttp.ClientTimeout(total=10000)
+            ) as response:
+                response.raise_for_status()
+                file_name = f"{int(time.time())}.mp4"
+                downloaded = 0
+                chunk_size = 1048576  # 1 MB
+                async with aiofiles.open(file_name, "wb") as file:
+                    async for chunk in response.content.iter_chunked(chunk_size):
+                        if chunk:
+                            await file.write(chunk)
+                            downloaded += len(chunk)
+
+        await current_message.edit_text(
+            text="Video Downloaded. Start Uploading",
+            disable_web_page_preview=False,
+        )
+        await bot.send_video(
+            chat_id=chat_id,
+            video=FSInputFile(file_name),
+            supports_streaming=True,
+            request_timeout=300,
+        )
+        await current_message.edit_text("Video uploaded to Telegram!🥳")
     except Exception as e:
-        print("ERR_DELETE", e)
-
-
-async def send_video_to_telegram(file_name):
-    url = f"http://127.0.0.1:8081/bot{bot_token}/sendVideo"
-
-    payload = {"chat_id": chat_id, "supports_streaming": "true"}
-
-    async with aiohttp.ClientSession() as session:
-        with open(file_name, "rb") as video_file:
-            files = {"video": (file_name, video_file, "application/octet-stream")}
-            async with session.post(url, data=payload, files=files) as response:
-                response_data = await response.json()
-                return response_data
+        print("ERR_DOWNLOADING", e)
+    finally:    
+        try:
+            os.remove(file_name)
+        except Exception as e:
+            print("ERR_DELETE", e)
 
 
 if __name__ == "__main__":
