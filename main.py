@@ -7,6 +7,8 @@ from urllib.parse import urlencode
 import aiofiles
 import aiohttp
 from aiogram import Bot, Dispatcher, F, types
+from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.client.telegram import TelegramAPIServer
 from aiogram.filters.command import Command
 from aiogram.types import FSInputFile
 from bs4 import BeautifulSoup
@@ -15,7 +17,8 @@ from settings import admin_id, bot_token, chat_id
 
 
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=bot_token)
+session = AiohttpSession(api=TelegramAPIServer.from_base("http://localhost:8081"))
+bot = Bot(session=session, token=bot_token)
 dp = Dispatcher()
 
 
@@ -29,7 +32,7 @@ async def cmd_start(message: types.Message):
 
 
 @dp.message(F.text.regexp(r"http://|https://") | F.text.regexp(r"tiktok|douyin"))
-async def video_download(message: types.Message):
+async def upload_to_channel(message: types.Message):
     if message.from_user.id != admin_id:
         await message.answer("You are not admin.")
         return
@@ -89,16 +92,33 @@ async def video_download(message: types.Message):
         text="Video Downloaded. Start Uploading",
         disable_web_page_preview=False,
     )
-
     await bot.send_video(
         chat_id=chat_id, video=FSInputFile(file_name), supports_streaming=True
     )
     await current_message.edit_text("Video uploaded to Telegram!🥳")
 
+    # response = await send_video_to_telegram(file_name)
+    # if response.get("ok"):
+    #     await current_message.edit_text("Video uploaded to Telegram!🥳")
+    # else:
+    #     await current_message.edit_text("Failed to upload video. Please try again.")
     try:
         os.remove(file_name)
     except Exception as e:
         print("ERR_DELETE", e)
+
+
+async def send_video_to_telegram(file_name):
+    url = f"http://127.0.0.1:8081/bot{bot_token}/sendVideo"
+
+    payload = {"chat_id": chat_id, "supports_streaming": "true"}
+
+    async with aiohttp.ClientSession() as session:
+        with open(file_name, "rb") as video_file:
+            files = {"video": (file_name, video_file, "application/octet-stream")}
+            async with session.post(url, data=payload, files=files) as response:
+                response_data = await response.json()
+                return response_data
 
 
 if __name__ == "__main__":
