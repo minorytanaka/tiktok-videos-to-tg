@@ -65,7 +65,6 @@ CHAT_ID=your_chat_id
 docker-compose up --build
 ```
 8. The bot will now be up and available. Send the link to the TikTok video to the bot and it will download and send the video to your chat.
-```
 
 ---
 
