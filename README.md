@@ -45,7 +45,7 @@ https://api.telegram.org/bot<BOT_TOKEN>/logOut
 ```
 4. If no errors appear and the server has taken over the terminal, then all is well. To make sure, open another terminal and run the command:
 ```bash
-curl http://<ipi_address_where_telegram_bot_api>:8081
+curl http://<ip_address_telegram_bot_api>:8081
 ```
 In response, you should see the following:
 {“ok”:false, “error_code”:404, “description”: “Not Found”}.
