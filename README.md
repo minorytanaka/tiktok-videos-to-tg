@@ -33,37 +33,44 @@ In order for the bot to work properly, you need to add it to your channel and gr
 ### How to use
 
 1. Use the generator instructions to compile Telegram Bot Api: https://tdlib.github.io/telegram-bot-api/build.html.
+
 2. Start the Telegram Bot Api server:
 ```bash
 telegram-bot-api --local --api-id=<api_id> --api-hash=<api_hash>
 ```
+
 3. Transfer bot to Local Bot API
 To switch your bot to a local api server, you first need to disconnect it from the Telegram Bot Api cloud platform.
 There is a logOut method for this purpose. You can simply open the link in your browser by replacing <BOT_TOKEN> with your bot's real token:
-``bash
+```bash
 https://api.telegram.org/bot<BOT_TOKEN>/logOut
 ```
+
 4. If no errors appear and the server has taken over the terminal, then all is well. To make sure, open another terminal and run the command:
 ```bash
 curl http://<ip_address_telegram_bot_api>:8081
 ```
 In response, you should see the following:
 {“ok”:false, “error_code”:404, “description”: “Not Found”}.
+
 5. Clone the repository:
 ```bash
 git clone https://github.com/minorytanaka/tiktok-videos-to-tg.git
 cd tiktok-videos-to-tg
 ```
+
 6. Create an `.env` file and add your variables:
 ```env
 BOT_TOKEN=your_telegram_bot_token
 ADMIN_ID=your_user_id
 CHAT_ID=your_chat_id
 ```
+
 7. Build and run the project using Docker Compose:
 ```bash
 docker-compose up --build
 ```
+
 8. The bot will now be up and available. Send the link to the TikTok video to the bot and it will download and send the video to your chat.
 
 ---
@@ -102,33 +109,39 @@ docker-compose up --build
 ### Как использовать
 
 1. Воспользуйтесь генератором инструкция для компиляции Telegram Bot Api: https://tdlib.github.io/telegram-bot-api/build.html
+
 2. Запускаем сервер Telegram Bot Api:
 ```bash
 telegram-bot-api --local --api-id=<api_id> --api-hash=<api_hash>
 ```
+
 3. Перенос бота на Local Bot API
 Чтобы переключить вашего бота на локальный сервер api, сначала нужно отключить его от облачной платформы Telegram Bot Api.
 Для этого существует метод logOut. Вы можете просто открыть в браузере ссылку, заменив <BOT_TOKEN> на настоящий токен вашего бота:
 ```bash
 https://api.telegram.org/bot<BOT_TOKEN>/logOut
 ```
+
 4. Если никаких ошибок не появилось и сервер занял собой терминал, значит все хорошо. Чтобы окончательно убедиться, откройте еще один терминал и выполните команду:
 ```bash
 curl http://<айпи_адрес_где_запущен_телеграм_бот_апи>:8081
 ```
 В ответ вы должны увидеть следующее:
 {"ok":false,"error_code":404,"description":"Not Found"}
+
 5. Клонируйте репозиторий:
 ```bash
 git clone https://github.com/minorytanaka/tiktok-videos-to-tg.git
 cd tiktok-videos-to-tg
 ```
+
 6. Создайте файл `.env` и добавьте свои переменные:
 ```env
 BOT_TOKEN=your_telegram_bot_token
 ADMIN_ID=your_user_id
 CHAT_ID=your_chat_id
 ```
+
 7. Соберите и запустите проект с использованием Docker Compose:
 ```bash
 docker-compose up --build
