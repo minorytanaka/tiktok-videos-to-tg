@@ -164,5 +164,3 @@ For the bot to function correctly, it must be added to your channel and granted 
     
     - Отправьте боту ссылку на видео TikTok.
     - Бот загрузит видео и отправит его в ваш чат.
-
----
