@@ -28,7 +28,7 @@ async def main():
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
-    await message.answer("Привет, отправь ссылку на видео из TikTok")
+    await message.answer("Send me a link to a video from TikTok")
 
 
 @dp.message(F.text.regexp(r"http://|https://") | F.text.regexp(r"tiktok|douyin"))
