@@ -1,3 +1,8 @@
+
+Вот обновленная инструкция с добавлением блока информации о добавлении сервисного файла для автоматического запуска:
+
+---
+
 ## EN
 
 ### Project Description
@@ -82,12 +87,73 @@ For the bot to function correctly, it must be added to your channel and granted 
     - Send a TikTok video link to the bot.
     - The bot will download the video and send it to your chat.
 
+### Optional: Create a service for autorun Local Bot API
+
+If you'd like the bot to start automatically when your system boots, you can create a `systemd` service. Here's how to do it.
+If another instance of Telegram Bot API is already running, there may be a conflict. Check if the process is active: `ps aux | grep telegram-bot-api` and terminate `kill <id>` or `kill -9 <id>` (forced termination).
+
+1. **Create the Service File**:
+    
+    Create a new file for the service:
+    
+    ```bash
+    sudo nano /etc/systemd/system/telegram-bot-api.service
+    ```
+    
+    Paste the following content into the file, adjusting the paths as necessary:
+    
+    ```ini
+    [Unit]
+    Description=Telegram Bot API Server
+    After=network.target
+    
+    [Service]
+    ExecStart=/root/telegram-bot-api/build/telegram-bot-api --local --api-id=<api_id> --api-hash=<api_hash>
+    WorkingDirectory=/root/telegram-bot-api/build
+    Restart=always
+    User=root
+    Group=root
+    
+    [Install]
+    WantedBy=multi-user.target
+    ```
+    
+2. **Reload Systemd**:
+    
+    Run the following command to reload systemd and apply the new service configuration:
+    
+    ```bash
+    sudo systemctl daemon-reload
+    ```
+    
+3. **Enable the Service**:
+    
+    Enable the service to start automatically on boot:
+    
+    ```bash
+    sudo systemctl enable telegram-bot-api.service
+    ```
+    
+4. **Start the Service**:
+    
+    Start the service manually for the first time:
+    
+    ```bash
+    sudo systemctl start telegram-bot-api.service
+    ```
+    
+5. **Check the Status**:
+    
+    Check if the service is running correctly:
+    
+    ```bash
+    sudo systemctl status telegram-bot-api.service
+    ```
 ## RU
 
 ### Описание проекта
 
-Проект представляет собой Telegram-бота, написанного на Python с использованием библиотеки **aiogram**. Бот предназначен для скачивания видео с TikTok и отправки их в указанный чат Telegram. Для использования функционала требуется авторизация: доступ имеет только пользователь с ID, указанным в файле `.env` (переменная `ADMIN_ID`).
-Видео удаляется с сервера после отправки в чат.
+Проект представляет собой Telegram-бота, написанного на Python с использованием библиотеки **aiogram**. Бот предназначен для скачивания видео с TikTok и отправки их в указанный чат Telegram. Для использования функционала требуется авторизация: доступ имеет только пользователь с ID, указанным в файле `.env` (переменная `ADMIN_ID`). Видео удаляется с сервера после отправки в чат.
 
 Для корректной работы бота его необходимо добавить в ваш канал и предоставить права на создание сообщений.
 
@@ -164,3 +230,68 @@ For the bot to function correctly, it must be added to your channel and granted 
     
     - Отправьте боту ссылку на видео TikTok.
     - Бот загрузит видео и отправит его в ваш чат.
+
+### Опционально: Создаем сервис для автозапуска Local Bot API
+
+Если вы хотите, чтобы Local Bot API запускался автоматически при старте системы, можно создать сервисный файл `systemd`.
+Если уже запущен другой экземпляр Telegram Bot API, может быть конфликт. Проверьте, активен ли процесс: `ps aux | grep telegram-bot-api` и завершите процесс `kill <id>` либо `kill -9 <id>` (принудительное завершение).
+
+1. **Создайте сервисный файл**:
+    
+    Создайте новый файл для сервиса:
+    
+    ```bash
+    sudo nano /etc/systemd/system/telegram-bot-api.service
+    ```
+    
+    Вставьте следующий контент в файл, заменив пути при необходимости:
+    
+    ```ini
+    [Unit]
+    Description=Telegram Bot API Server
+    After=network.target
+    
+    [Service]
+    ExecStart=/root/telegram-bot-api/build/telegram-bot-api --local --api-id=<api_id> --api-hash=<api_hash>
+    WorkingDirectory=/root/telegram-bot-api/build
+    Restart=always
+    User=root
+    Group=root
+    
+    [Install]
+    WantedBy=multi-user.target
+    ```
+    
+2. **Перезагрузите systemd**:
+    
+    Выполните команду для перезагрузки systemd и применения новой конфигурации сервиса:
+    
+    ```bash
+    sudo systemctl daemon-reload
+    ```
+    
+3. **Включите сервис**:
+    
+    Включите сервис для автоматического старта при загрузке системы:
+    
+    ```bash
+    sudo systemctl enable telegram-bot-api.service
+    ```
+    
+4. **Запустите сервис**:
+    
+    Запустите сервис вручную в первый раз:
+    
+
+	```bash
+	sudo systemctl start telegram-bot-api.service
+	```
+
+5. **Проверьте статус**:
+    
+    Проверьте, что сервис работает правильно:
+    
+    ```bash
+    sudo systemctl status telegram-bot-api.service
+    ```
+---
