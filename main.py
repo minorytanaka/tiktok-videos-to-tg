@@ -7,7 +7,6 @@ from urllib.parse import urlencode
 import aiofiles
 import aiohttp
 from aiogram import Bot, Dispatcher, F, types
-from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.telegram import TelegramAPIServer
 from aiogram.filters.command import Command
 from aiogram.types import FSInputFile
@@ -17,8 +16,8 @@ from settings import admin_id, bot_token, chat_id, ip, port
 
 
 logging.basicConfig(level=logging.INFO)
-session = AiohttpSession(api=TelegramAPIServer.from_base(f"http://{ip}:{port}"))
-bot = Bot(session=session, token=bot_token)
+local_server = TelegramAPIServer.from_base(f"http://{ip}:{port}")
+bot = Bot(server=local_server, token=bot_token)
 dp = Dispatcher()
 
 
