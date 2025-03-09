@@ -76,7 +76,7 @@ async def upload_to_channel(message: types.Message):
         # Downloading Video
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                video_url, timeout=aiohttp.ClientTimeout(total=10000)
+                video_url, timeout=aiohttp.ClientTimeout(total=30000)
             ) as response:
                 response.raise_for_status()
                 file_name = f"{int(time.time())}.mp4"
