@@ -15,6 +15,8 @@ from bs4 import BeautifulSoup
 from settings import admin_id, bot_token, chat_id, ip, port
 
 
+DELETE_VIDEO_DELAY = 3
+
 logging.basicConfig(level=logging.INFO)
 local_server = TelegramAPIServer.from_base(f"http://{ip}:{port}")
 bot = Bot(server=local_server, token=bot_token)
@@ -101,8 +103,13 @@ async def upload_to_channel(message: types.Message):
         await current_message.edit_text("Успешно! 🥳")
     except Exception as e:
         print("ERR_DOWNLOADING", e)
+        await current_message.edit_text(
+            text=f"Ошибка: {e}",
+            disable_web_page_preview=False,
+        )
     finally:    
         try:
+            await asyncio.sleep(DELETE_VIDEO_DELAY)
             os.remove(file_name)
         except Exception as e:
             print("ERR_DELETE", e)
