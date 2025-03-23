@@ -27,17 +27,17 @@ async def main():
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
-    await message.answer("Send me a link to a video from TikTok")
+    await message.answer("Отправь мне ссылку на тик-ток видео")
 
 
 @dp.message(F.text.regexp(r"http://|https://") | F.text.regexp(r"tiktok|douyin"))
 async def upload_to_channel(message: types.Message):
     if message.from_user.id != admin_id:
-        await message.answer("You are not admin.")
+        await message.answer("Недостаточно прав")
         return
 
     current_message = await bot.send_message(
-        chat_id=message.chat.id, text="Downloading..."
+        chat_id=message.chat.id, text="Получил ссылку, загружаю в сервис"
     )
 
     # Build and request
@@ -56,7 +56,7 @@ async def upload_to_channel(message: types.Message):
     # Check status code
     if response["status"] != "ok":
         await current_message.edit_text(
-            text="Status code not ok",
+            text="Статус код не 'ok'",
             disable_web_page_preview=False,
         )
 
@@ -68,7 +68,7 @@ async def upload_to_channel(message: types.Message):
         if "HD" in link.get_text(strip=True)
     )
     await current_message.edit_text(
-        text="Got video link",
+        text="Нашел ссылку на видео, пробую скачать",
         disable_web_page_preview=False,
     )
 
@@ -89,7 +89,7 @@ async def upload_to_channel(message: types.Message):
                             downloaded += len(chunk)
 
         await current_message.edit_text(
-            text="Video Downloaded. Start Uploading",
+            text="Видео скачано, пробую загрузить в канал",
             disable_web_page_preview=False,
         )
         await bot.send_video(
@@ -98,7 +98,7 @@ async def upload_to_channel(message: types.Message):
             supports_streaming=True,
             request_timeout=300,
         )
-        await current_message.edit_text("Video uploaded to Telegram!🥳")
+        await current_message.edit_text("Успешно! 🥳")
     except Exception as e:
         print("ERR_DOWNLOADING", e)
     finally:    
