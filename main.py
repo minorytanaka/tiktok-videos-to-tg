@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 import aiofiles
 import aiohttp
 from aiogram import Bot, Dispatcher, F, types
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.client.telegram import TelegramAPIServer
 from aiogram.filters.command import Command
 from aiogram.types import FSInputFile
@@ -19,7 +20,8 @@ DELETE_VIDEO_DELAY = 3
 
 logging.basicConfig(level=logging.INFO)
 local_server = TelegramAPIServer.from_base(f"http://{ip}:{port}")
-bot = Bot(server=local_server, token=bot_token)
+session = AiohttpSession(api=local_server)
+bot = Bot(token=bot_token, session=session)
 dp = Dispatcher()
 
 
