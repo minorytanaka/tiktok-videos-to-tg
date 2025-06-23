@@ -3,7 +3,7 @@ import logging
 import os
 import time
 from urllib.parse import urlencode
-
+from settings import allowed_ids, allowed_usernames
 import aiofiles
 import aiohttp
 from aiogram import Bot, Dispatcher, F, types
@@ -36,8 +36,12 @@ async def cmd_start(message: types.Message):
 
 @dp.message(F.text.regexp(r"http://|https://") | F.text.regexp(r"tiktok|douyin"))
 async def upload_to_channel(message: types.Message):
-    if message.from_user.id != admin_id:
-        await message.answer("Недостаточно прав")
+    user_id = message.from_user.id
+    username = message.from_user.username
+
+    if user_id not in allowed_ids and username not in allowed_usernames:
+        print(f"❌ Отказано: {user_id=} {username=}")
+        await message.answer("Недостаточно прав ❌")
         return
 
     current_message = await bot.send_message(
