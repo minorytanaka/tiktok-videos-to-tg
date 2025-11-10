@@ -20,7 +20,8 @@ DELETE_VIDEO_DELAY = 3
 
 local_server = TelegramAPIServer.from_base(f"http://{ip}:{port}")
 session = AiohttpSession(api=local_server)
-bot = Bot(token=bot_token, session=session)
+# bot = Bot(token=bot_token, session=session)
+bot = Bot(token=bot_token)
 dp = Dispatcher()
 
 logger = logging.getLogger(__name__)

@@ -32,7 +32,7 @@ class DBService:
 
     def get_mode_by_name(self, mode_name: str):
         with sqlite3.connect(DB_NAME) as conn:
-            cursor = conn.execute("SELECT id FROM modes WHERE name = ?", (mode_name,))
+            cursor = conn.execute("SELECT id FROM modes WHERE value = ?", (mode_name,))
             row = cursor.fetchone()
             return row[0]
 
@@ -59,7 +59,11 @@ class DBService:
     def add_user(self, user_id: int, username: str, first_name: str, mode_id: int):
         with sqlite3.connect(DB_NAME) as conn:
             conn.execute("""
-                INSERT OR IGNORE INTO users (user_id, username, first_name, mode_id)
-                VALUES (?, ?, ?, ?);
+                INSERT INTO users (user_id, username, first_name, mode_id)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    username = excluded.username,
+                    first_name = excluded.first_name,
+                    mode_id = excluded.mode_id
             """, (user_id, username, first_name, mode_id))
             conn.commit()
