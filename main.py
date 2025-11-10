@@ -3,7 +3,7 @@ import logging
 import os
 import time
 from urllib.parse import urlencode
-from settings import allowed_ids, allowed_usernames
+
 import aiofiles
 import aiohttp
 from aiogram import Bot, Dispatcher, F, types
@@ -13,8 +13,7 @@ from aiogram.filters.command import Command
 from aiogram.types import FSInputFile
 from bs4 import BeautifulSoup
 
-from settings import admin_id, bot_token, chat_id, ip, port
-
+from settings import allowed_ids, bot_token, chat_id, ip, port
 
 DELETE_VIDEO_DELAY = 3
 
@@ -24,6 +23,7 @@ session = AiohttpSession(api=local_server)
 bot = Bot(token=bot_token, session=session)
 dp = Dispatcher()
 
+logger = logging.getLogger(__name__)
 
 async def main():
     await dp.start_polling(bot)
@@ -37,10 +37,10 @@ async def cmd_start(message: types.Message):
 @dp.message(F.text.regexp(r"http://|https://") | F.text.regexp(r"tiktok|douyin"))
 async def upload_to_channel(message: types.Message):
     user_id = message.from_user.id
-    username = message.from_user.username
+    user_chat_id = message.chat.id
 
-    if user_id not in allowed_ids and username not in allowed_usernames:
-        print(f"❌ Отказано: {user_id=} {username=}")
+    if user_id not in allowed_ids:
+        print(f"❌ Отказано: {user_id=}")
         await message.answer("Недостаточно прав ❌")
         return
 
@@ -97,16 +97,15 @@ async def upload_to_channel(message: types.Message):
                             downloaded += len(chunk)
 
         await current_message.edit_text(
-            text="Видео скачано, пробую загрузить в канал",
+            text="Видео скачано, отправляю...",
             disable_web_page_preview=False,
         )
         await bot.send_video(
-            chat_id=chat_id,
+            chat_id=user_chat_id,
             video=FSInputFile(file_name),
             supports_streaming=True,
             request_timeout=300,
         )
-        await current_message.edit_text("Успешно! 🥳")
     except Exception as e:
         print("ERR_DOWNLOADING", e)
         await current_message.edit_text(
