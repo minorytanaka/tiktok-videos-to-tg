@@ -35,8 +35,8 @@ async def main():
 async def cmd_start(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            InlineKeyboardButton(text="📢 Отправка в канал", callback_data="set_mode_CHANNEL"),
-            InlineKeyboardButton(text="💬 Отправка пользователю", callback_data="set_mode_PRIVATE")
+            [InlineKeyboardButton(text="📢 Отправка в канал", callback_data="set_mode_CHANNEL")],
+            [InlineKeyboardButton(text="💬 Отправка пользователю", callback_data="set_mode_PRIVATE")]
         ]
     )
     await message.answer(
@@ -187,10 +187,8 @@ async def cmd_mode(message: types.Message):
         text = "Ты ещё не выбрал режим.\nВыбери, как бот будет отправлять видео:"
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text="📢 Отправка в канал", callback_data="set_mode_CHANNEL"),
-            InlineKeyboardButton(text="💬 Отправка пользователю", callback_data="set_mode_PRIVATE")
-        ]
+        [InlineKeyboardButton(text="📢 Отправка в канал", callback_data="set_mode_CHANNEL")],
+        [InlineKeyboardButton(text="💬 Отправка пользователю", callback_data="set_mode_PRIVATE")]
     ])
 
     await message.answer(text, reply_markup=keyboard, parse_mode="HTML")
