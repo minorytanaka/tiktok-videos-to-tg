@@ -4,7 +4,7 @@ env = Env()
 env.read_env()
 
 bot_token = env.str("BOT_TOKEN")
-chat_id = env.int("CHAT_ID")
+chat_id_to_send = env.int("CHAT_ID")
 admin_id = env.int("ADMIN_ID")
 ip = env.str("BOT_API_IP")
 port = env.str("PORT")
